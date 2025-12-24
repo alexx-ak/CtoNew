@@ -68,7 +68,10 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
             entity.Property(e => e.IsDeleted).HasColumnName("IsDeleted");
             entity.Property(e => e.DeletedAt).HasColumnName("DeletionTime");
             entity.Property(e => e.DeletedBy).HasColumnName("DeleterUserId");
-            entity.Property(e => e.TenantId).HasColumnName("TenantId");
+
+            // Note: TenantId from BaseEntity is not mapped as this table is accessed globally
+            // Ignore it for Tenant entity
+            entity.Ignore(e => e.TenantId);
 
             // Tenant-specific properties
             entity.Property(e => e.Name).IsRequired().HasMaxLength(128).HasColumnName("Name");

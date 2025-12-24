@@ -56,7 +56,7 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
     public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
         entity.UpdatedAt = DateTime.UtcNow;
-        entity.ModifiedBy = "System"; // Will be replaced with actual user when auth is implemented
+        entity.ModifiedBy = 0; // Will be replaced with actual user ID when auth is implemented
 
         _dbSet.Update(entity);
         await Task.CompletedTask;
@@ -69,7 +69,7 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
         {
             entity.IsDeleted = true;
             entity.DeletedAt = DateTime.UtcNow;
-            entity.DeletedBy = "System"; // Will be replaced with actual user when auth is implemented
+            entity.DeletedBy = 0; // Will be replaced with actual user ID when auth is implemented
 
             _dbSet.Update(entity);
         }

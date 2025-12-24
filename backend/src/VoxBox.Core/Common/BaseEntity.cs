@@ -13,13 +13,13 @@ public abstract class BaseEntity
 
     // Audit columns
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public string? CreatedBy { get; set; }
+    public long? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
-    public string? ModifiedBy { get; set; }
+    public long? ModifiedBy { get; set; }
 
     // Soft delete support
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
-    public string? DeletedBy { get; set; }
+    public long? DeletedBy { get; set; }
 }

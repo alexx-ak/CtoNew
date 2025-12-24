@@ -8,6 +8,13 @@ namespace VoxBox.Core.Entities;
 /// </summary>
 public class Tenant : BaseEntity
 {
-    // Properties will be defined based on the SQL CREATE TABLE statement
-    // TenantId and IsHost are inherited from BaseEntity and configuration
+    public string Name { get; set; } = string.Empty;
+    public string TenancyName { get; set; } = string.Empty;
+    public bool IsPrivate { get; set; } = false;
+    public int VoteWeightMode { get; set; } = 0;
+    public string AdminIdentifiers { get; set; } = string.Empty;
+    public bool IsActive { get; set; } = true;
+
+    // Host tenant is identified by TenancyName "host"
+    public bool IsHost => TenancyName.Equals("host", StringComparison.OrdinalIgnoreCase);
 }

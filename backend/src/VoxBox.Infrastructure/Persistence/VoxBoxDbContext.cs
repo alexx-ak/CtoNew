@@ -51,6 +51,38 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
     {
         base.OnModelCreating(modelBuilder);
 
+        // Configure Tenant entity
+        modelBuilder.Entity<Tenant>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            // Map to SQL table name
+            entity.ToTable("Tenants");
+
+            // Map base entity properties to SQL column names
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.CreatedAt).HasColumnName("CreationTime");
+            entity.Property(e => e.CreatedBy).HasColumnName("CreatorUserId");
+            entity.Property(e => e.UpdatedAt).HasColumnName("LastModificationTime");
+            entity.Property(e => e.ModifiedBy).HasColumnName("LastModifierUserId");
+            entity.Property(e => e.IsDeleted).HasColumnName("IsDeleted");
+            entity.Property(e => e.DeletedAt).HasColumnName("DeletionTime");
+            entity.Property(e => e.DeletedBy).HasColumnName("DeleterUserId");
+            entity.Property(e => e.TenantId).HasColumnName("TenantId");
+
+            // Tenant-specific properties
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(128).HasColumnName("Name");
+            entity.Property(e => e.TenancyName).IsRequired().HasMaxLength(64).HasColumnName("TenancyName");
+            entity.Property(e => e.IsPrivate).HasColumnName("IsPrivate");
+            entity.Property(e => e.VoteWeightMode).HasColumnName("VoteWeightMode");
+            entity.Property(e => e.AdminIdentifiers).IsRequired().HasMaxLength(50).HasColumnName("AdminIdentifiers");
+            entity.Property(e => e.IsActive).HasColumnName("IsActive");
+
+            // Indexes
+            entity.HasIndex(e => e.TenancyName).IsUnique();
+            entity.HasIndex(e => e.IsActive);
+        });
+
         // Configure SampleEntity (placeholder until first table is created)
         modelBuilder.Entity<SampleEntity>(entity =>
         {
@@ -103,14 +135,14 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
 
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.ModifiedBy = "System"; // Will be replaced with actual user when auth is implemented
+                    entry.Entity.ModifiedBy = 0; // Will be replaced with actual user ID when auth is implemented
                     break;
 
                 case EntityState.Deleted:
                     // Intercept delete operations to implement soft delete
                     entry.Entity.IsDeleted = true;
                     entry.Entity.DeletedAt = DateTime.UtcNow;
-                    entry.Entity.DeletedBy = "System"; // Will be replaced with actual user when auth is implemented
+                    entry.Entity.DeletedBy = 0; // Will be replaced with actual user ID when auth is implemented
                     entry.State = EntityState.Modified;
                     break;
             }

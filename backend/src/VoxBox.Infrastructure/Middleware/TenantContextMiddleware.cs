@@ -21,33 +21,33 @@ public class TenantContextMiddleware
 
     public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext, IVoxBoxDbContextFactory dbContextFactory)
     {
-        var subdomain = ExtractSubdomain(context.Request.Host);
+        var tenancyName = ExtractSubdomain(context.Request.Host);
 
-        if (!string.IsNullOrEmpty(subdomain))
+        if (!string.IsNullOrEmpty(tenancyName))
         {
-            _logger.LogDebug("Extracted subdomain: {Subdomain}", subdomain);
+            _logger.LogDebug("Extracted tenancy name: {TenancyName}", tenancyName);
 
             var dbContext = (VoxBoxDbContext)dbContextFactory.CreateDbContext();
 
             var tenant = await dbContext.Set<Tenant>()
                 .IgnoreQueryFilters()
-                .Where(t => t.Subdomain == subdomain)
-                .Select(t => new { t.Id, t.IsHost, t.Subdomain })
+                .Where(t => t.TenancyName == tenancyName)
+                .Select(t => new { t.Id, t.TenancyName, t.IsHost })
                 .FirstOrDefaultAsync();
 
             if (tenant != null)
             {
-                tenantContext.SetTenant(tenant.Id, tenant.IsHost, tenant.Subdomain);
+                tenantContext.SetTenant(tenant.Id, tenant.IsHost, tenant.TenancyName);
                 _logger.LogDebug("Tenant identified: {TenantId}, IsHost: {IsHost}", tenant.Id, tenant.IsHost);
             }
             else
             {
-                _logger.LogWarning("No tenant found for subdomain: {Subdomain}", subdomain);
+                _logger.LogWarning("No tenant found for tenancy name: {TenancyName}", tenancyName);
             }
         }
         else
         {
-            _logger.LogDebug("No subdomain found in request host: {Host}", context.Request.Host);
+            _logger.LogDebug("No tenancy name found in request host: {Host}", context.Request.Host);
         }
 
         await _next(context);
@@ -62,11 +62,11 @@ public class TenantContextMiddleware
         // Handle localhost development scenarios
         if (hostString.Contains("localhost") || hostString.Contains("127.0.0.1"))
         {
-            // For development, you can use a query parameter or header
-            return null;
+            // For development, return "host" as default
+            return "host";
         }
 
-        // Expected format: subdomain.domain.com
+        // Expected format: tenancyname.domain.com
         var parts = hostString.Split('.');
 
         if (parts.Length >= 3)

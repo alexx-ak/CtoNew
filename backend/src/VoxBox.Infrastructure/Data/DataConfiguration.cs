@@ -32,7 +32,7 @@ public static class DataConfiguration
         }, ServiceLifetime.Scoped);
 
         // Register IVoxBoxDbContextFactory
-        services.AddScoped<IVoxBoxDbContextFactory>(serviceProvider =>
+        services.AddScoped(serviceProvider =>
         {
             var options = serviceProvider.GetRequiredService<DbContextOptions<VoxBoxDbContext>>();
             var tenantContext = serviceProvider.GetRequiredService<ITenantContext>();
@@ -44,19 +44,12 @@ public static class DataConfiguration
 /// <summary>
 /// Factory implementation for creating DbContext instances with proper options
 /// </summary>
-public class VoxBoxDbContextFactory : IVoxBoxDbContextFactory
+public class VoxBoxDbContextFactory(
+    DbContextOptions<VoxBoxDbContext> options,
+    ITenantContext tenantContext) : IVoxBoxDbContextFactory
 {
-    private readonly DbContextOptions<VoxBoxDbContext> _options;
-    private readonly ITenantContext _tenantContext;
-
-    public VoxBoxDbContextFactory(DbContextOptions<VoxBoxDbContext> options, ITenantContext tenantContext)
-    {
-        _options = options;
-        _tenantContext = tenantContext;
-    }
-
     public VoxBoxDbContext CreateDbContext()
     {
-        return new VoxBoxDbContext(_options, _tenantContext);
+        return new VoxBoxDbContext(options, tenantContext);
     }
 }

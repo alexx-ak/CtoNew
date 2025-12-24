@@ -11,17 +11,8 @@ namespace VoxBox.Infrastructure.Persistence;
 /// KISS: Simple CRUD operations
 /// </summary>
 /// <typeparam name="T">Entity type</typeparam>
-public class EfRepository<T> : IRepository<T> where T : BaseEntity
+public class EfRepository<T>(DbSet<T> dbSet, ITenantContext tenantContext) : IRepository<T> where T : BaseEntity
 {
-    private readonly DbSet<T> _dbSet;
-    private readonly ITenantContext _tenantContext;
-
-    public EfRepository(DbSet<T> dbSet, ITenantContext tenantContext)
-    {
-        _dbSet = dbSet;
-        _tenantContext = tenantContext;
-    }
-
     public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await GetQuery(includeDeleted: false)
@@ -47,9 +38,9 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
     public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
     {
         entity.CreatedAt = DateTime.UtcNow;
-        entity.TenantId = _tenantContext.TenantId;
+        entity.TenantId = tenantContext.TenantId;
 
-        await _dbSet.AddAsync(entity, cancellationToken);
+        await dbSet.AddAsync(entity, cancellationToken);
         return entity;
     }
 
@@ -58,7 +49,7 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
         entity.UpdatedAt = DateTime.UtcNow;
         entity.ModifiedBy = 0; // Will be replaced with actual user ID when auth is implemented
 
-        _dbSet.Update(entity);
+        dbSet.Update(entity);
         await Task.CompletedTask;
     }
 
@@ -71,13 +62,13 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
             entity.DeletedAt = DateTime.UtcNow;
             entity.DeletedBy = 0; // Will be replaced with actual user ID when auth is implemented
 
-            _dbSet.Update(entity);
+            dbSet.Update(entity);
         }
     }
 
     private IQueryable<T> GetQuery(bool includeDeleted)
     {
-        var query = _dbSet.AsQueryable();
+        var query = dbSet.AsQueryable();
 
         // Apply global query filters are handled by EF Core automatically
         // When includeDeleted is true, bypass the soft-delete filter

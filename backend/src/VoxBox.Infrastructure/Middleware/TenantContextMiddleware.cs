@@ -8,24 +8,17 @@ namespace VoxBox.Infrastructure.Middleware;
 /// Middleware to extract tenant information from the request subdomain.
 /// The subdomain is used to identify which tenant the request belongs to.
 /// </summary>
-public class TenantContextMiddleware
+public class TenantContextMiddleware(
+    RequestDelegate next,
+    ILogger<TenantContextMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<TenantContextMiddleware> _logger;
-
-    public TenantContextMiddleware(RequestDelegate next, ILogger<TenantContextMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
-
     public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext, IVoxBoxDbContextFactory dbContextFactory)
     {
         var tenancyName = ExtractSubdomain(context.Request.Host);
 
         if (!string.IsNullOrEmpty(tenancyName))
         {
-            _logger.LogDebug("Extracted tenancy name: {TenancyName}", tenancyName);
+            logger.LogDebug("Extracted tenancy name: {TenancyName}", tenancyName);
 
             var dbContext = (VoxBoxDbContext)dbContextFactory.CreateDbContext();
 
@@ -38,19 +31,19 @@ public class TenantContextMiddleware
             if (tenant != null)
             {
                 tenantContext.SetTenant(tenant.Id, tenant.IsHost, tenant.TenancyName);
-                _logger.LogDebug("Tenant identified: {TenantId}, IsHost: {IsHost}", tenant.Id, tenant.IsHost);
+                logger.LogDebug("Tenant identified: {TenantId}, IsHost: {IsHost}", tenant.Id, tenant.IsHost);
             }
             else
             {
-                _logger.LogWarning("No tenant found for tenancy name: {TenancyName}", tenancyName);
+                logger.LogWarning("No tenant found for tenancy name: {TenancyName}", tenancyName);
             }
         }
         else
         {
-            _logger.LogDebug("No tenancy name found in request host: {Host}", context.Request.Host);
+            logger.LogDebug("No tenancy name found in request host: {Host}", context.Request.Host);
         }
 
-        await _next(context);
+        await next(context);
 
         tenantContext.Clear();
     }

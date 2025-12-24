@@ -51,18 +51,7 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure Tenant entity
-        modelBuilder.Entity<Tenant>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Subdomain).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.HasIndex(e => e.Subdomain).IsUnique();
-            entity.HasIndex(e => e.IsHost);
-        });
-
-        // Configure SampleEntity
+        // Configure SampleEntity (placeholder until first table is created)
         modelBuilder.Entity<SampleEntity>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -73,11 +62,14 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
         // Apply global query filters to all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => typeof(BaseEntity).IsAssignableFrom(e.ClrType)))
         {
+            // Skip Tenant entity from query filters as it needs to be accessed globally
+            if (entityType.ClrType == typeof(Tenant))
+                continue;
+
             // Soft delete filter
             entityType.AddQueryFilter($"{nameof(BaseEntity.IsDeleted)} == false");
 
             // Tenant isolation filter - only apply if tenant context has a value
-            // We use a lambda expression that EF Core will evaluate at runtime
             entityType.AddQueryFilter((BaseEntity e) =>
                 EF.Property<Guid?>(e, nameof(BaseEntity.TenantId)) == _tenantContext.TenantId ||
                 _tenantContext.TenantId == null);

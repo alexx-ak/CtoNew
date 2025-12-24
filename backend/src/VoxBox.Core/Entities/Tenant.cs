@@ -8,9 +8,6 @@ namespace VoxBox.Core.Entities;
 /// </summary>
 public class Tenant : BaseEntity
 {
-    public string Name { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public string Subdomain { get; set; } = string.Empty;
-    public bool IsHost { get; set; } = false;
-    public bool IsActive { get; set; } = true;
+    // Properties will be defined based on the SQL CREATE TABLE statement
+    // TenantId and IsHost are inherited from BaseEntity and configuration
 }

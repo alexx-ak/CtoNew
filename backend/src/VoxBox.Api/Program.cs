@@ -5,11 +5,7 @@ using VoxBox.Infrastructure.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new() { Title = "VoxBox API", Version = "v1" });
-});
+builder.Services.AddOpenApi();
 
 // Configure SQL Server with EF Core Code First
 builder.Services.ConfigureSqlServer(builder.Configuration);
@@ -19,11 +15,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "VoxBox API v1");
-    });
+    app.MapOpenApi();
 }
 
 // Add tenant context middleware before other middleware

@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{65343B9B-0C90-46A5-9196-9FAB13902504}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.Core", "src\VoxBox.Core\VoxBox.Core.csproj", "{2E114643-7EDA-4A67-A08A-5CACD4DD680F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.Infrastructure", "src\VoxBox.Infrastructure\VoxBox.Infrastructure.csproj", "{B7A8FC5A-E2CE-4E99-8B52-D9ABEE291158}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.Api", "src\VoxBox.Api\VoxBox.Api.csproj", "{A6CF2F61-6CE2-4DBD-902B-777E301D3270}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BA890D41-8462-4381-8339-D07064BEBBDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.Tests", "tests\VoxBox.Tests\VoxBox.Tests.csproj", "{72FF7896-0930-4B69-A502-B3C9131F77BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E114643-7EDA-4A67-A08A-5CACD4DD680F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E114643-7EDA-4A67-A08A-5CACD4DD680F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E114643-7EDA-4A67-A08A-5CACD4DD680F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E114643-7EDA-4A67-A08A-5CACD4DD680F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7A8FC5A-E2CE-4E99-8B52-D9ABEE291158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7A8FC5A-E2CE-4E99-8B52-D9ABEE291158}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7A8FC5A-E2CE-4E99-8B52-D9ABEE291158}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7A8FC5A-E2CE-4E99-8B52-D9ABEE291158}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6CF2F61-6CE2-4DBD-902B-777E301D3270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6CF2F61-6CE2-4DBD-902B-777E301D3270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6CF2F61-6CE2-4DBD-902B-777E301D3270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6CF2F61-6CE2-4DBD-902B-777E301D3270}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72FF7896-0930-4B69-A502-B3C9131F77BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72FF7896-0930-4B69-A502-B3C9131F77BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72FF7896-0930-4B69-A502-B3C9131F77BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72FF7896-0930-4B69-A502-B3C9131F77BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2E114643-7EDA-4A67-A08A-5CACD4DD680F} = {65343B9B-0C90-46A5-9196-9FAB13902504}
+		{B7A8FC5A-E2CE-4E99-8B52-D9ABEE291158} = {65343B9B-0C90-46A5-9196-9FAB13902504}
+		{A6CF2F61-6CE2-4DBD-902B-777E301D3270} = {65343B9B-0C90-46A5-9196-9FAB13902504}
+		{72FF7896-0930-4B69-A502-B3C9131F77BD} = {BA890D41-8462-4381-8339-D07064BEBBDD}
+	EndGlobalSection
+EndGlobal

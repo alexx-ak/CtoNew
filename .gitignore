@@ -1,0 +1,106 @@
+# VoxBox - Combined .gitignore for Angular and .NET
+
+###################
+# Angular / Node
+###################
+# Dependencies
+frontend/node_modules/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build outputs
+frontend/dist/
+frontend/.angular/
+frontend/out-tsc/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Angular specific
+frontend/.angular/cache/
+
+# Environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+###################
+# .NET
+###################
+# Build results
+backend/[Dd]ebug/
+backend/[Dd]ebugPublic/
+backend/[Rr]elease/
+backend/[Rr]eleases/
+backend/x64/
+backend/x86/
+backend/[Aa][Rr][Mm]/
+backend/[Aa][Rr][Mm]64/
+backend/bld/
+backend/[Bb]in/
+backend/[Oo]bj/
+backend/[Ll]og/
+backend/[Ll]ogs/
+
+# .NET Core
+backend/project.lock.json
+backend/project.fragment.lock.json
+backend/artifacts/
+
+# NuGet Packages
+backend/*.nupkg
+backend/*.snupkg
+backend/**/packages/*
+!backend/**/packages/build/
+
+# Visual Studio cache/options
+backend/.vs/
+backend/*.suo
+backend/*.user
+backend/*.userosscache
+backend/*.sln.docstates
+
+# User-specific files
+backend/*.rsuser
+
+# ReSharper
+backend/_ReSharper*/
+backend/*.[Rr]e[Ss]harper
+backend/*.DotSettings.user
+
+# Rider
+.idea/
+backend/.idea/
+
+# User secrets
+backend/**/appsettings.Development.json
+backend/**/appsettings.*.json
+!backend/**/appsettings.json
+
+# Database
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal
+
+###################
+# General
+###################
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

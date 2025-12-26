@@ -1,11 +1,11 @@
 using VoxBox.Infrastructure.Data;
+using VoxBox.Infrastructure.Middleware;
 using VoxBox.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 // Configure SQL Server with EF Core Code First
 builder.Services.ConfigureSqlServer(builder.Configuration);
@@ -15,9 +15,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
 }
+
+// Add tenant context middleware before other middleware
+app.UseTenantContext();
 
 app.UseHttpsRedirection();
 

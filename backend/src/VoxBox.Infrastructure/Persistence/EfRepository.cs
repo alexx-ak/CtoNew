@@ -11,45 +11,72 @@ namespace VoxBox.Infrastructure.Persistence;
 /// KISS: Simple CRUD operations
 /// </summary>
 /// <typeparam name="T">Entity type</typeparam>
-public class EfRepository<T> : IRepository<T> where T : BaseEntity
+public class EfRepository<T>(DbSet<T> dbSet, ITenantContext tenantContext) : IRepository<T> where T : BaseEntity
 {
-    private readonly DbSet<T> _dbSet;
-    
-    public EfRepository(DbSet<T> dbSet)
-    {
-        _dbSet = dbSet;
-    }
-    
     public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FindAsync(new object[] { id }, cancellationToken);
+        return await GetQuery(includeDeleted: false)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
-    
+
+    public async Task<T?> GetByIdAsync(int id, bool includeDeleted, CancellationToken cancellationToken = default)
+    {
+        return await GetQuery(includeDeleted)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
     public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet.ToListAsync(cancellationToken);
+        return await GetQuery(includeDeleted: false).ToListAsync(cancellationToken);
     }
-    
+
+    public async Task<IEnumerable<T>> GetAllAsync(bool includeDeleted, CancellationToken cancellationToken = default)
+    {
+        return await GetQuery(includeDeleted).ToListAsync(cancellationToken);
+    }
+
     public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
     {
         entity.CreatedAt = DateTime.UtcNow;
-        await _dbSet.AddAsync(entity, cancellationToken);
+        entity.TenantId = tenantContext.TenantId;
+
+        await dbSet.AddAsync(entity, cancellationToken);
         return entity;
     }
-    
+
     public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
         entity.UpdatedAt = DateTime.UtcNow;
-        _dbSet.Update(entity);
+        entity.ModifiedBy = 0; // Will be replaced with actual user ID when auth is implemented
+
+        dbSet.Update(entity);
         await Task.CompletedTask;
     }
-    
+
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await GetByIdAsync(id, cancellationToken);
+        var entity = await GetByIdAsync(id, includeDeleted: false, cancellationToken);
         if (entity != null)
         {
-            _dbSet.Remove(entity);
+            entity.IsDeleted = true;
+            entity.DeletedAt = DateTime.UtcNow;
+            entity.DeletedBy = 0; // Will be replaced with actual user ID when auth is implemented
+
+            dbSet.Update(entity);
         }
+    }
+
+    private IQueryable<T> GetQuery(bool includeDeleted)
+    {
+        var query = dbSet.AsQueryable();
+
+        // Apply global query filters are handled by EF Core automatically
+        // When includeDeleted is true, bypass the soft-delete filter
+        if (includeDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
+        return query;
     }
 }

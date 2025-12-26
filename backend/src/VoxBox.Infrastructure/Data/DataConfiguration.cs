@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using VoxBox.Core.Interfaces.Persistence;
 using VoxBox.Infrastructure.Persistence;
 
 namespace VoxBox.Infrastructure.Data;
@@ -11,7 +12,7 @@ namespace VoxBox.Infrastructure.Data;
 public static class DataConfiguration
 {
     public const string ConnectionStringName = "VoxBoxConnection";
-    
+
     public static void ConfigureSqlServer(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(ConnectionStringName);
@@ -19,8 +20,36 @@ public static class DataConfiguration
         {
             throw new InvalidOperationException("Connection string 'VoxBoxConnection' not found.");
         }
-        
-        services.AddDbContext<VoxBoxDbContext>(options =>
-            options.UseSqlServer(connectionString));
+
+        // Register TenantContext as scoped service
+        services.AddScoped<ITenantContext, TenantContext>();
+
+        // Register DbContext with scoped TenantContext
+        services.AddDbContext<VoxBoxDbContext>((serviceProvider, options) =>
+        {
+            var tenantContext = serviceProvider.GetRequiredService<ITenantContext>();
+            options.UseSqlServer(connectionString);
+        }, ServiceLifetime.Scoped);
+
+        // Register IVoxBoxDbContextFactory
+        services.AddScoped(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<DbContextOptions<VoxBoxDbContext>>();
+            var tenantContext = serviceProvider.GetRequiredService<ITenantContext>();
+            return new VoxBoxDbContextFactory(options, tenantContext);
+        });
+    }
+}
+
+/// <summary>
+/// Factory implementation for creating DbContext instances with proper options
+/// </summary>
+public class VoxBoxDbContextFactory(
+    DbContextOptions<VoxBoxDbContext> options,
+    ITenantContext tenantContext) : IVoxBoxDbContextFactory
+{
+    public VoxBoxDbContext CreateDbContext()
+    {
+        return new VoxBoxDbContext(options, tenantContext);
     }
 }

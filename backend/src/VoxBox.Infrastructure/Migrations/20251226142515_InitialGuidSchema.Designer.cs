@@ -12,8 +12,8 @@ using VoxBox.Infrastructure.Persistence;
 namespace VoxBox.Infrastructure.Migrations
 {
     [DbContext(typeof(VoxBoxDbContext))]
-    [Migration("20251226113839_AddUserEntity")]
-    partial class AddUserEntity
+    [Migration("20251226142515_InitialGuidSchema")]
+    partial class InitialGuidSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,12 +27,10 @@ namespace VoxBox.Infrastructure.Migrations
 
             modelBuilder.Entity("VoxBox.Core.Entities.Tenant", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AdminIdentifiers")
                         .IsRequired()
@@ -44,16 +42,16 @@ namespace VoxBox.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CreationTime");
 
-                    b.Property<long?>("CreatedBy")
-                        .HasColumnType("bigint")
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("CreatorUserId");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("DeletionTime");
 
-                    b.Property<long?>("DeletedBy")
-                        .HasColumnType("bigint")
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("DeleterUserId");
 
                     b.Property<bool>("IsActive")
@@ -68,8 +66,8 @@ namespace VoxBox.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsPrivate");
 
-                    b.Property<long?>("ModifiedBy")
-                        .HasColumnType("bigint")
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("LastModifierUserId");
 
                     b.Property<string>("Name")
@@ -104,27 +102,25 @@ namespace VoxBox.Infrastructure.Migrations
 
             modelBuilder.Entity("VoxBox.Core.Entities.User", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("CreationTime");
 
-                    b.Property<long?>("CreatedBy")
-                        .HasColumnType("bigint")
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("CreatorUserId");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("DeletionTime");
 
-                    b.Property<long?>("DeletedBy")
-                        .HasColumnType("bigint")
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("DeleterUserId");
 
                     b.Property<string>("EmailAddress")
@@ -150,8 +146,8 @@ namespace VoxBox.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
-                    b.Property<long?>("ModifiedBy")
-                        .HasColumnType("bigint")
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier")
                         .HasColumnName("LastModifierUserId");
 
                     b.Property<string>("Name")
@@ -179,8 +175,8 @@ namespace VoxBox.Infrastructure.Migrations
                         .HasColumnType("nvarchar(64)")
                         .HasColumnName("Surname");
 
-                    b.Property<int?>("TenantId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")

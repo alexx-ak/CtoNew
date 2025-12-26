@@ -6,9 +6,9 @@ namespace VoxBox.Core.Interfaces.Persistence;
 /// </summary>
 public interface ITenantContext
 {
-    int? TenantId { get; }
+    Guid? TenantId { get; }
     bool IsHost { get; }
     string? Subdomain { get; }
-    void SetTenant(int? tenantId, bool isHost, string? subdomain);
+    void SetTenant(Guid? tenantId, bool isHost, string? subdomain);
     void Clear();
 }

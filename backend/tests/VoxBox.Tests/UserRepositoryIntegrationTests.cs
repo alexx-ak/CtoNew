@@ -68,7 +68,7 @@ public class UserRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
         // Assert - Fetch the user after save to verify ID was generated
         var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == uniqueUsername);
         Assert.NotNull(savedUser);
-        Assert.NotEqual(0, savedUser.Id);
+        Assert.NotEqual(Guid.Empty, savedUser.Id);
         Assert.Equal(uniqueUsername, savedUser.UserName);
         Assert.True(savedUser.CreatedAt <= DateTime.UtcNow);
     }
@@ -77,7 +77,7 @@ public class UserRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
     public async Task AddAsync_ShouldSetTenantId_FromContext()
     {
         // Arrange
-        var testTenantId = 42;
+        var testTenantId = Guid.NewGuid();
         _tenantContext.SetTestTenantContext(testTenantId);
         var uniqueUsername = GetUniqueUsername("testctx");
         var user = new User
@@ -139,7 +139,7 @@ public class UserRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         _tenantContext.SetHostContext();
-        var nonExistentId = -999L;
+        var nonExistentId = Guid.NewGuid();
 
         // Act
         var result = await _repository.GetByIdAsync(nonExistentId);

@@ -49,7 +49,7 @@ public class EfRepositoryInMemoryTests : IDisposable
 
         // Assert
         Assert.NotNull(result);
-        Assert.NotEqual(0, result.Id);
+        Assert.NotEqual(Guid.Empty, result.Id);
         Assert.Equal("InMemory Test Tenant", result.Name);
     }
 
@@ -146,7 +146,7 @@ public class EfRepositoryInMemoryTests : IDisposable
         Assert.NotNull(result);
         Assert.True(result.IsDeleted);
         Assert.NotNull(result.DeletedAt);
-        Assert.Equal(0, result.DeletedBy);
+        Assert.Null(result.DeletedBy);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class EfRepositoryInMemoryTests : IDisposable
     public async Task InMemory_TenantContext_ShouldSetTenantId()
     {
         // Arrange
-        var expectedTenantId = 12345;
+        var expectedTenantId = Guid.NewGuid();
         _tenantContext.SetTestTenantContext(expectedTenantId);
         
         var tenant = new Tenant

@@ -63,7 +63,7 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
         // Assert - Fetch the tenant after save to verify ID was generated
         var savedTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.TenancyName == uniqueName);
         Assert.NotNull(savedTenant);
-        Assert.NotEqual(0, savedTenant.Id);
+        Assert.NotEqual(Guid.Empty, savedTenant.Id);
         Assert.Equal("Test Tenant for Add", savedTenant.Name);
         Assert.True(savedTenant.CreatedAt <= DateTime.UtcNow);
     }
@@ -72,7 +72,7 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
     public async Task AddAsync_ShouldSetTenantId_FromContext()
     {
         // Arrange
-        var testTenantId = 42;
+        var testTenantId = Guid.NewGuid();
         _tenantContext.SetTestTenantContext(testTenantId);
         var uniqueName = GetUniqueTenancyName("testctx");
         var tenant = new Tenant
@@ -134,7 +134,7 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         _tenantContext.SetHostContext();
-        var nonExistentId = -999;
+        var nonExistentId = Guid.NewGuid();
 
         // Act
         var result = await _repository.GetByIdAsync(nonExistentId);
@@ -381,7 +381,7 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
         Assert.NotNull(deletedTenant);
         Assert.True(deletedTenant.IsDeleted);
         Assert.NotNull(deletedTenant.DeletedAt);
-        Assert.Equal(0, deletedTenant.DeletedBy); // Set to 0 as per current implementation
+        Assert.Null(deletedTenant.DeletedBy); // Set to null to avoid FK constraints
     }
 
     #endregion
@@ -392,7 +392,7 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
     public async Task Repository_ShouldRespectTenantContext_Isolation()
     {
         // Arrange - Create tenant with one tenant context
-        _tenantContext.SetTestTenantContext(tenantId: 100, subdomain: "tenant1");
+        _tenantContext.SetTestTenantContext(tenantId: Guid.NewGuid(), subdomain: "tenant1");
         var tenant1Name = GetUniqueTenancyName("isol1");
         var tenant1 = new Tenant
         {
@@ -408,7 +408,7 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
         var tenantId1 = tenant1.Id;
 
         // Create tenant with different tenant context
-        _tenantContext.SetTestTenantContext(tenantId: 200, subdomain: "tenant2");
+        _tenantContext.SetTestTenantContext(tenantId: Guid.NewGuid(), subdomain: "tenant2");
         var tenant2Name = GetUniqueTenancyName("isol2");
         var tenant2 = new Tenant
         {
@@ -425,13 +425,13 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
         _context.ChangeTracker.Clear();
 
         // Act - Query with tenant 1 context
-        _tenantContext.SetTestTenantContext(tenantId: 100, subdomain: "tenant1");
+        _tenantContext.SetTestTenantContext(subdomain: "tenant1");
         var resultTenant1 = (await _repository.GetAllAsync()).ToList();
 
         _context.ChangeTracker.Clear();
 
         // Query with tenant 2 context
-        _tenantContext.SetTestTenantContext(tenantId: 200, subdomain: "tenant2");
+        _tenantContext.SetTestTenantContext(subdomain: "tenant2");
         var resultTenant2 = (await _repository.GetAllAsync()).ToList();
 
         // Assert - Each tenant should only see their own data (via TenantId filter)

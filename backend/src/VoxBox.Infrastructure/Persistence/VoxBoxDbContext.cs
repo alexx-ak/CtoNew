@@ -82,8 +82,8 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
             entity.Property(e => e.IsActive).HasColumnName("IsActive");
 
             // Indexes
-            entity.HasIndex(e => e.TenancyName).IsUnique();
-            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.TenancyName);
+            entity.HasIndex(e => new { e.TenancyName, e.IsActive }).IsUnique();
         });
 
         // Configure SampleEntity (placeholder until first table is created)

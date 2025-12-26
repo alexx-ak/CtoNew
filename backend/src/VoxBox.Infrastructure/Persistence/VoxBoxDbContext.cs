@@ -25,7 +25,6 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
-    public DbSet<SampleEntity> SampleEntities => Set<SampleEntity>();
 
     public IVoxBoxDbContextFactory CreateDbContextFactory() => this;
 
@@ -86,13 +85,6 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
             entity.HasIndex(e => e.IsActive);
         });
 
-        // Configure SampleEntity (placeholder until first table is created)
-        modelBuilder.Entity<SampleEntity>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Description).HasMaxLength(500);
-        });
 
         // Apply global query filters to all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => typeof(BaseEntity).IsAssignableFrom(e.ClrType)))

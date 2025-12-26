@@ -25,6 +25,7 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<User> Users => Set<User>();
 
     public IVoxBoxDbContextFactory CreateDbContextFactory() => this;
 
@@ -44,6 +45,17 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
             _repositories[type] = repo;
         }
         return (IRepository<T>)repo;
+    }
+
+    public IRepositoryLong<T> GetRepositoryLong<T>() where T : BaseEntityLong
+    {
+        var type = typeof(T);
+        if (!_repositories.TryGetValue(type, out var repo))
+        {
+            repo = new EfRepositoryLong<T>(Set<T>(), _tenantContext);
+            _repositories[type] = repo;
+        }
+        return (IRepositoryLong<T>)repo;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -85,6 +97,48 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
             entity.HasIndex(e => new { e.TenancyName, e.IsActive }).IsUnique();
         });
 
+        // Configure User entity
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            // Map to SQL table name
+            entity.ToTable("Users");
+
+            // Map base entity properties to SQL column names
+            entity.Property(e => e.Id).HasColumnName("Id");
+            entity.Property(e => e.CreatedAt).HasColumnName("CreationTime");
+            entity.Property(e => e.CreatedBy).HasColumnName("CreatorUserId");
+            entity.Property(e => e.UpdatedAt).HasColumnName("LastModificationTime");
+            entity.Property(e => e.ModifiedBy).HasColumnName("LastModifierUserId");
+            entity.Property(e => e.IsDeleted).HasColumnName("IsDeleted");
+            entity.Property(e => e.DeletedAt).HasColumnName("DeletionTime");
+            entity.Property(e => e.DeletedBy).HasColumnName("DeleterUserId");
+
+            // User-specific properties
+            entity.Property(e => e.UserName).IsRequired().HasMaxLength(256).HasColumnName("UserName");
+            entity.Property(e => e.Name).HasMaxLength(64).HasColumnName("Name");
+            entity.Property(e => e.Surname).HasMaxLength(64).HasColumnName("Surname");
+            entity.Property(e => e.EmailAddress).HasMaxLength(256).HasColumnName("EmailAddress");
+            entity.Property(e => e.PhoneNumber).HasMaxLength(32).HasColumnName("PhoneNumber");
+            entity.Property(e => e.IsActive).HasColumnName("IsActive");
+            entity.Property(e => e.Identifier).HasMaxLength(50).HasColumnName("Identifier");
+            entity.Property(e => e.VoteWeight).HasColumnType("decimal(18,2)").HasColumnName("VoteWeight");
+            entity.Property(e => e.IdentyumUuid).HasMaxLength(40).HasColumnName("IdentyumUuid");
+            entity.Property(e => e.PreviousName).HasMaxLength(64).HasColumnName("PreviousName");
+            entity.Property(e => e.PreviousSurname).HasMaxLength(64).HasColumnName("PreviousSurname");
+
+            // Indexes
+            entity.HasIndex(e => e.UserName);
+            entity.HasIndex(e => e.EmailAddress);
+            entity.HasIndex(e => e.TenantId);
+
+            // Foreign key relationships (self-referencing)
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.CreatedBy).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.ModifiedBy).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.DeletedBy).OnDelete(DeleteBehavior.Restrict);
+        });
+
 
         // Apply global query filters to all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => typeof(BaseEntity).IsAssignableFrom(e.ClrType)))
@@ -96,6 +150,19 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
             // Soft delete filter
             var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
             var isDeletedProperty = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.IsDeleted));
+            var isDeletedFalse = System.Linq.Expressions.Expression.Constant(false);
+            var softDeleteCondition = System.Linq.Expressions.Expression.Equal(isDeletedProperty, isDeletedFalse);
+            var filterLambda = System.Linq.Expressions.Expression.Lambda(softDeleteCondition, parameter);
+
+            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(filterLambda);
+        }
+
+        // Apply global query filters to all entities inheriting from BaseEntityLong
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => typeof(BaseEntityLong).IsAssignableFrom(e.ClrType)))
+        {
+            // Soft delete filter
+            var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
+            var isDeletedProperty = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntityLong.IsDeleted));
             var isDeletedFalse = System.Linq.Expressions.Expression.Constant(false);
             var softDeleteCondition = System.Linq.Expressions.Expression.Equal(isDeletedProperty, isDeletedFalse);
             var filterLambda = System.Linq.Expressions.Expression.Lambda(softDeleteCondition, parameter);
@@ -119,6 +186,7 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
     private void SetAuditFields()
     {
         var entries = ChangeTracker.Entries<BaseEntity>();
+        var longEntries = ChangeTracker.Entries<BaseEntityLong>();
 
         foreach (var entry in entries)
         {
@@ -131,14 +199,38 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
 
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.ModifiedBy = 0; // Will be replaced with actual user ID when auth is implemented
+                    entry.Entity.ModifiedBy = null; // Set to null to avoid foreign key constraints
                     break;
 
                 case EntityState.Deleted:
                     // Intercept delete operations to implement soft delete
                     entry.Entity.IsDeleted = true;
                     entry.Entity.DeletedAt = DateTime.UtcNow;
-                    entry.Entity.DeletedBy = 0; // Will be replaced with actual user ID when auth is implemented
+                    entry.Entity.DeletedBy = null; // Set to null to avoid foreign key constraints
+                    entry.State = EntityState.Modified;
+                    break;
+            }
+        }
+
+        foreach (var entry in longEntries)
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                    entry.Entity.TenantId = _tenantContext.TenantId;
+                    break;
+
+                case EntityState.Modified:
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                    entry.Entity.ModifiedBy = null; // Set to null to avoid foreign key constraints
+                    break;
+
+                case EntityState.Deleted:
+                    // Intercept delete operations to implement soft delete
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.DeletedAt = DateTime.UtcNow;
+                    entry.Entity.DeletedBy = null; // Set to null to avoid foreign key constraints
                     entry.State = EntityState.Modified;
                     break;
             }

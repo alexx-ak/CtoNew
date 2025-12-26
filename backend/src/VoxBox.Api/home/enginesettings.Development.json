@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "SqlServer2022": "Data Source=SQL6033.site4now.net;Initial Catalog=db_a88d4a_ctonewvoxbox;User Id=db_a88d4a_ctonewvoxbox_admin;Password= ctonewvoxbox@123456"
+  }
+}

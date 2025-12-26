@@ -5,7 +5,7 @@ using VoxBox.Core.Interfaces.Persistence;
 namespace VoxBox.Infrastructure.Persistence;
 
 /// <summary>
-/// Generic EF Repository implementation for entities with long IDs following SOLID:
+/// Generic EF Repository implementation for entities with Guid IDs using UUID v7 following SOLID:
 /// - Single Responsibility: Only data access
 /// - Open/Closed: Extensible via base class
 /// KISS: Simple CRUD operations
@@ -13,13 +13,13 @@ namespace VoxBox.Infrastructure.Persistence;
 /// <typeparam name="T">Entity type</typeparam>
 public class EfRepositoryLong<T>(DbSet<T> dbSet, ITenantContext tenantContext) : IRepositoryLong<T> where T : BaseEntityLong
 {
-    public async Task<T?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await GetQuery(includeDeleted: false)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<T?> GetByIdAsync(long id, bool includeDeleted, CancellationToken cancellationToken = default)
+    public async Task<T?> GetByIdAsync(Guid id, bool includeDeleted, CancellationToken cancellationToken = default)
     {
         return await GetQuery(includeDeleted)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
@@ -53,7 +53,7 @@ public class EfRepositoryLong<T>(DbSet<T> dbSet, ITenantContext tenantContext) :
         await Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await GetByIdAsync(id, includeDeleted: false, cancellationToken);
         if (entity != null)

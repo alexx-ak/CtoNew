@@ -39,11 +39,11 @@ public class VoxBoxDbContextDesignFactory : IDesignTimeDbContextFactory<VoxBoxDb
 /// </summary>
 public class DesignTimeTenantContext : ITenantContext
 {
-    public int? TenantId => 1; // Default tenant ID for design time
+    public Guid? TenantId => Guid.NewGuid(); // Default tenant ID for design time
     public bool IsHost => false;
     public string? Subdomain => "design";
 
-    public void SetTenant(int? tenantId, bool isHost, string? subdomain)
+    public void SetTenant(Guid? tenantId, bool isHost, string? subdomain)
     {
         // No-op for design time
     }

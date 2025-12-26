@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -6,17 +6,40 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VoxBox.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddUserEntity : Migration
+    public partial class InitialGuidMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Tenants",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    TenancyName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    IsPrivate = table.Column<bool>(type: "bit", nullable: false),
+                    VoteWeightMode = table.Column<int>(type: "int", nullable: false),
+                    AdminIdentifiers = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatorUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifierUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleterUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tenants", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
                     Surname = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
@@ -28,14 +51,14 @@ namespace VoxBox.Infrastructure.Migrations
                     IdentyumUuid = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
                     PreviousName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
                     PreviousSurname = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                    TenantId = table.Column<int>(type: "int", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatorUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastModifierUserId = table.Column<long>(type: "bigint", nullable: true),
+                    LastModifierUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleterUserId = table.Column<long>(type: "bigint", nullable: true)
+                    DeleterUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -59,6 +82,17 @@ namespace VoxBox.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tenants_TenancyName",
+                table: "Tenants",
+                column: "TenancyName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tenants_TenancyName_IsActive",
+                table: "Tenants",
+                columns: new[] { "TenancyName", "IsActive" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_CreatorUserId",
@@ -94,6 +128,9 @@ namespace VoxBox.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Tenants");
+
             migrationBuilder.DropTable(
                 name: "Users");
         }

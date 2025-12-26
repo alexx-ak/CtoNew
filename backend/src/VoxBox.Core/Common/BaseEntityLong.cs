@@ -1,25 +1,25 @@
 namespace VoxBox.Core.Common;
 
 /// <summary>
-/// Base entity class with long ID for entities that need bigint primary keys
+/// Base entity class with Guid ID using UUID v7 for time-sortable primary keys
 /// Includes multitenancy, soft delete, and auditing support
 /// </summary>
 public abstract class BaseEntityLong
 {
-    public long Id { get; set; }
+    public Guid Id { get; set; } = GuidGenerator.GenerateNewGuid();
 
     // Multitenancy support
-    public int? TenantId { get; set; }
+    public Guid? TenantId { get; set; }
 
     // Audit columns
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public long? CreatedBy { get; set; }
+    public Guid? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
-    public long? ModifiedBy { get; set; }
+    public Guid? ModifiedBy { get; set; }
 
     // Soft delete support
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
-    public long? DeletedBy { get; set; }
+    public Guid? DeletedBy { get; set; }
 }

@@ -7,15 +7,15 @@ namespace VoxBox.Infrastructure.Persistence;
 /// </summary>
 public class TenantContext : ITenantContext
 {
-    private int? _tenantId;
+    private Guid? _tenantId;
     private bool _isHost;
     private string? _subdomain;
 
-    public int? TenantId => _tenantId;
+    public Guid? TenantId => _tenantId;
     public bool IsHost => _isHost;
     public string? Subdomain => _subdomain;
 
-    public void SetTenant(int? tenantId, bool isHost, string? subdomain)
+    public void SetTenant(Guid? tenantId, bool isHost, string? subdomain)
     {
         _tenantId = tenantId;
         _isHost = isHost;

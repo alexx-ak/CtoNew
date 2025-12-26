@@ -13,13 +13,13 @@ namespace VoxBox.Infrastructure.Persistence;
 /// <typeparam name="T">Entity type</typeparam>
 public class EfRepository<T>(DbSet<T> dbSet, ITenantContext tenantContext) : IRepository<T> where T : BaseEntity
 {
-    public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await GetQuery(includeDeleted: false)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<T?> GetByIdAsync(int id, bool includeDeleted, CancellationToken cancellationToken = default)
+    public async Task<T?> GetByIdAsync(Guid id, bool includeDeleted, CancellationToken cancellationToken = default)
     {
         return await GetQuery(includeDeleted)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
@@ -47,20 +47,20 @@ public class EfRepository<T>(DbSet<T> dbSet, ITenantContext tenantContext) : IRe
     public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
     {
         entity.UpdatedAt = DateTime.UtcNow;
-        entity.ModifiedBy = 0; // Will be replaced with actual user ID when auth is implemented
+        entity.ModifiedBy = null; // Will be replaced with actual user ID when auth is implemented
 
         dbSet.Update(entity);
         await Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await GetByIdAsync(id, includeDeleted: false, cancellationToken);
         if (entity != null)
         {
             entity.IsDeleted = true;
             entity.DeletedAt = DateTime.UtcNow;
-            entity.DeletedBy = 0; // Will be replaced with actual user ID when auth is implemented
+            entity.DeletedBy = null; // Set to null to avoid foreign key constraints
 
             dbSet.Update(entity);
         }

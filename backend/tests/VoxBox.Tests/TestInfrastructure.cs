@@ -24,7 +24,7 @@ public static class TestConfiguration
         ?? "Data Source=SQL6033.site4now.net;Initial Catalog=db_a88d4a_ctonewvoxbox;User Id=db_a88d4a_ctonewvoxbox_admin;Password= ctonewvoxbox@123456";
 
     // Test tenant settings
-    public const int TestTenantId = 1;
+    public static readonly Guid TestTenantId = Guid.NewGuid();
     public const string TestSubdomain = "testtenant";
     public const bool TestIsHost = false;
 }
@@ -34,11 +34,11 @@ public static class TestConfiguration
 /// </summary>
 public class TestTenantContext : ITenantContext
 {
-    public int? TenantId { get; private set; }
+    public Guid? TenantId { get; private set; }
     public bool IsHost { get; private set; }
     public string? Subdomain { get; private set; }
 
-    public void SetTenant(int? tenantId, bool isHost, string? subdomain)
+    public void SetTenant(Guid? tenantId, bool isHost, string? subdomain)
     {
         TenantId = tenantId;
         IsHost = isHost;
@@ -54,12 +54,12 @@ public class TestTenantContext : ITenantContext
 
     public void SetHostContext()
     {
-        SetTenant(0, true, "host");
+        SetTenant(Guid.Empty, true, "host");
     }
 
-    public void SetTestTenantContext(int tenantId = TestConfiguration.TestTenantId, string? subdomain = null)
+    public void SetTestTenantContext(Guid? tenantId = null, string? subdomain = null)
     {
-        SetTenant(tenantId, false, subdomain ?? TestConfiguration.TestSubdomain);
+        SetTenant(tenantId ?? TestConfiguration.TestTenantId, false, subdomain ?? TestConfiguration.TestSubdomain);
     }
 }
 

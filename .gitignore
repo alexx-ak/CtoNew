@@ -104,3 +104,8 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+/backend/src/VoxBox.Api/obj/
+/backend/src/VoxBox.Core/obj/
+/backend/src/VoxBox.Core/obj/
+/backend/tests/VoxBox.Tests/obj/
+/backend/src/VoxBox.Infrastructure/obj/

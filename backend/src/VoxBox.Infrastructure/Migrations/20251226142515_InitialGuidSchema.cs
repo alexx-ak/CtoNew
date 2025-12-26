@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VoxBox.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialGuidMigration : Migration
+    public partial class InitialGuidSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -425,13 +425,13 @@ public class EfRepositoryIntegrationTests : IClassFixture<TestDatabaseFixture>
         _context.ChangeTracker.Clear();
 
         // Act - Query with tenant 1 context
-        _tenantContext.SetTestTenantContext(tenantId: 100, subdomain: "tenant1");
+        _tenantContext.SetTestTenantContext(subdomain: "tenant1");
         var resultTenant1 = (await _repository.GetAllAsync()).ToList();
 
         _context.ChangeTracker.Clear();
 
         // Query with tenant 2 context
-        _tenantContext.SetTestTenantContext(tenantId: 200, subdomain: "tenant2");
+        _tenantContext.SetTestTenantContext(subdomain: "tenant2");
         var resultTenant2 = (await _repository.GetAllAsync()).ToList();
 
         // Assert - Each tenant should only see their own data (via TenantId filter)

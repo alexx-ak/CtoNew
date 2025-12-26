@@ -183,7 +183,7 @@ public class EfRepositoryInMemoryTests : IDisposable
     public async Task InMemory_TenantContext_ShouldSetTenantId()
     {
         // Arrange
-        var expectedTenantId = 12345;
+        var expectedTenantId = Guid.NewGuid();
         _tenantContext.SetTestTenantContext(expectedTenantId);
         
         var tenant = new Tenant

@@ -12,8 +12,8 @@ using VoxBox.Infrastructure.Persistence;
 namespace VoxBox.Infrastructure.Migrations
 {
     [DbContext(typeof(VoxBoxDbContext))]
-    [Migration("20251226133104_InitialGuidMigration")]
-    partial class InitialGuidMigration
+    [Migration("20251226142515_InitialGuidSchema")]
+    partial class InitialGuidSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

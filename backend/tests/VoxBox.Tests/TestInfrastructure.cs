@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using VoxBox.Core.Entities;
 using VoxBox.Core.Interfaces.Persistence;
 using VoxBox.Infrastructure.Persistence;
@@ -10,9 +11,17 @@ namespace VoxBox.Tests;
 /// </summary>
 public static class TestConfiguration
 {
-    // Integration test connection string for SQL Server 2022
-    public const string IntegrationTestConnectionString = 
-        "Data Source=SQL6033.site4now.net;Initial Catalog=db_a88d4a_ctonewvoxbox;User Id=db_a88d4a_ctonewvoxbox_admin;Password= ctonewvoxbox@123456";
+    private static IConfiguration? _configuration;
+
+    public static void Initialize(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    // Integration test connection string for SQL Server 2022 - reads from appsettings.json
+    public static string IntegrationTestConnectionString => 
+        _configuration?["ConnectionStrings:SqlServer2022"] 
+        ?? "Data Source=SQL6033.site4now.net;Initial Catalog=db_a88d4a_ctonewvoxbox;User Id=db_a88d4a_ctonewvoxbox_admin;Password= ctonewvoxbox@123456";
 
     // Test tenant settings
     public const int TestTenantId = 1;

@@ -5,12 +5,20 @@ This directory contains integration tests for the VoxBox repository layer using 
 ## Test Configuration
 
 ### Connection String
-Integration tests use a SQL Server 2022 database hosted on site4now.net:
-```
-Data Source=SQL6033.site4now.net;Initial Catalog=db_a88d4a_ctonewvoxbox;User Id=db_a88d4a_ctonewvoxbox_admin;Password= ctonewvoxbox@123456
+Integration tests use a SQL Server 2022 database hosted on site4now.net. The connection string is configured in:
+
+**Application Configuration** (`backend/src/VoxBox.Api/home/enginesettings.Development.json`):
+```json
+{
+  "ConnectionStrings": {
+    "SqlServer2022": "Data Source=SQL6033.site4now.net;Initial Catalog=db_a88d4a_ctonewvoxbox;User Id=db_a88d4a_ctonewvoxbox_admin;Password= ctonewvoxbox@123456"
+  }
+}
 ```
 
-**Note:** The connection string is defined in `TestConfiguration.cs` and should be updated for different environments.
+**Tests Configuration** (`backend/tests/VoxBox.Tests/TestInfrastructure.cs`):
+- Reads from appsettings via `IConfiguration`
+- Falls back to hardcoded default if not found
 
 ## Test Classes
 

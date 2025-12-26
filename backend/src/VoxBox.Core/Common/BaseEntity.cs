@@ -9,7 +9,7 @@ public abstract class BaseEntity
     public int Id { get; set; }
 
     // Multitenancy support
-    public Guid? TenantId { get; set; }
+    public int? TenantId { get; set; }
 
     // Audit columns
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

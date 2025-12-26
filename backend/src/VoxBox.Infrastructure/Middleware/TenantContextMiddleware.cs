@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using VoxBox.Core.Entities;
 using VoxBox.Core.Interfaces.Persistence;
+using VoxBox.Infrastructure.Persistence;
 
 namespace VoxBox.Infrastructure.Middleware;
 
@@ -20,7 +24,7 @@ public class TenantContextMiddleware(
         {
             logger.LogDebug("Extracted tenancy name: {TenancyName}", tenancyName);
 
-            var dbContext = (VoxBoxDbContext)dbContextFactory.CreateDbContext();
+            var dbContext = (VoxBoxDbContext)dbContextFactory.CreateDbContext() ?? throw new InvalidOperationException("Failed to create DbContext.");
 
             var tenant = await dbContext.Set<Tenant>()
                 .IgnoreQueryFilters()

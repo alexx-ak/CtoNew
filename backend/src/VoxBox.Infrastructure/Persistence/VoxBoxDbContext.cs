@@ -29,7 +29,7 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
 
     public IVoxBoxDbContextFactory CreateDbContextFactory() => this;
 
-    public VoxBoxDbContext CreateDbContext()
+    public object CreateDbContext()
     {
         var optionsBuilder = new DbContextOptionsBuilder<VoxBoxDbContext>();
         optionsBuilder.UseSqlServer(Database.GetDbConnection().ConnectionString);
@@ -102,12 +102,13 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
                 continue;
 
             // Soft delete filter
-            entityType.AddQueryFilter($"{nameof(BaseEntity.IsDeleted)} == false");
+            var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
+            var isDeletedProperty = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.IsDeleted));
+            var isDeletedFalse = System.Linq.Expressions.Expression.Constant(false);
+            var softDeleteCondition = System.Linq.Expressions.Expression.Equal(isDeletedProperty, isDeletedFalse);
+            var filterLambda = System.Linq.Expressions.Expression.Lambda(softDeleteCondition, parameter);
 
-            // Tenant isolation filter - only apply if tenant context has a value
-            entityType.AddQueryFilter((BaseEntity e) =>
-                EF.Property<Guid?>(e, nameof(BaseEntity.TenantId)) == _tenantContext.TenantId ||
-                _tenantContext.TenantId == null);
+            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(filterLambda);
         }
     }
 

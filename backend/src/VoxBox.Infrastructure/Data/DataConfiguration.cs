@@ -48,7 +48,7 @@ public class VoxBoxDbContextFactory(
     DbContextOptions<VoxBoxDbContext> options,
     ITenantContext tenantContext) : IVoxBoxDbContextFactory
 {
-    public VoxBoxDbContext CreateDbContext()
+    public object CreateDbContext()
     {
         return new VoxBoxDbContext(options, tenantContext);
     }

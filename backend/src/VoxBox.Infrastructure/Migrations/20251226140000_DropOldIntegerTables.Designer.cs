@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VoxBox.Infrastructure.Migrations;
 
 [DbContext(typeof(VoxBox.Infrastructure.Persistence.VoxBoxDbContext))]
-[Migration("20251226143000_DropOldIntegerTables")]
+[Migration("20251226140000_DropOldIntegerTables")]
 partial class DropOldIntegerTables
 {
     /// <inheritdoc />

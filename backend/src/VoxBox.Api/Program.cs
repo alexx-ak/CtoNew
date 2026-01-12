@@ -2,7 +2,12 @@ using VoxBox.Infrastructure.Data;
 using VoxBox.Infrastructure.Middleware;
 using VoxBox.Infrastructure.Persistence;
 
+// Ensure configuration files are loaded explicitly
 var builder = WebApplication.CreateBuilder(args);
+
+// Explicitly add appsettings configuration
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile($"home/engine/projectsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
 // Add services to the container
 builder.Services.AddOpenApi();

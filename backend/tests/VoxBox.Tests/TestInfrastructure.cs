@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using VoxBox.Core.Entities;
 using VoxBox.Core.Interfaces.Persistence;
@@ -18,10 +20,8 @@ public static class TestConfiguration
         _configuration = configuration;
     }
 
-    // Integration test connection string for SQL Server 2022 - reads from appsettings.json
-    public static string IntegrationTestConnectionString => 
-        _configuration?["ConnectionStrings:SqlServer2022"] 
-        ?? "Data Source=SQL6033.site4now.net;Initial Catalog=db_a88d4a_ctonewvoxbox;User Id=db_a88d4a_ctonewvoxbox_admin;Password= ctonewvoxbox@123456";
+    // Use in-memory database for testing - no external dependencies
+    public static string InMemoryConnectionString => "InMemoryTestDatabase";
 
     // Test tenant settings
     public static readonly Guid TestTenantId = Guid.NewGuid();
@@ -64,24 +64,25 @@ public class TestTenantContext : ITenantContext
 }
 
 /// <summary>
-/// Database fixture for integration tests using real SQL Server 2022
+/// Database fixture for integration tests using in-memory database
 /// </summary>
 public class TestDatabaseFixture : IDisposable
 {
     private readonly DbContextOptions<VoxBoxDbContext> _options;
     private readonly TestTenantContext _tenantContext;
+    private readonly VoxBoxDbContext _context;
     private bool _disposed;
 
     public TestDatabaseFixture()
     {
         _tenantContext = new TestTenantContext();
         _options = new DbContextOptionsBuilder<VoxBoxDbContext>()
-            .UseSqlServer(TestConfiguration.IntegrationTestConnectionString)
+            .UseInMemoryDatabase(TestConfiguration.InMemoryConnectionString)
             .Options;
 
         // Ensure database is created
-        using var context = CreateDbContext();
-        context.Database.EnsureCreated();
+        _context = CreateDbContext();
+        _context.Database.EnsureCreated();
     }
 
     public VoxBoxDbContext CreateDbContext()
@@ -91,10 +92,23 @@ public class TestDatabaseFixture : IDisposable
 
     public TestTenantContext GetTenantContext() => _tenantContext;
 
+    // Helper method to clear all data for fresh test runs
+    public void ClearDatabase()
+    {
+        using var context = CreateDbContext();
+        
+        // Clear all entities
+        context.Tenants.RemoveRange(context.Tenants.ToList());
+        context.Users.RemoveRange(context.Users.ToList());
+        
+        context.SaveChanges();
+    }
+
     public void Dispose()
     {
         if (!_disposed)
         {
+            _context?.Dispose();
             _disposed = true;
         }
     }

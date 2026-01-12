@@ -31,25 +31,10 @@ public static class DataConfiguration
             options.UseSqlServer(connectionString);
         }, ServiceLifetime.Scoped);
 
-        // Register IVoxBoxDbContextFactory
-        services.AddScoped(serviceProvider =>
+        // Register IVoxBoxDbContextFactory using VoxBoxDbContext implementation
+        services.AddScoped<IVoxBoxDbContextFactory>(serviceProvider =>
         {
-            var options = serviceProvider.GetRequiredService<DbContextOptions<VoxBoxDbContext>>();
-            var tenantContext = serviceProvider.GetRequiredService<ITenantContext>();
-            return new VoxBoxDbContextFactory(options, tenantContext);
+            return serviceProvider.GetRequiredService<VoxBoxDbContext>();
         });
-    }
-}
-
-/// <summary>
-/// Factory implementation for creating DbContext instances with proper options
-/// </summary>
-public class VoxBoxDbContextFactory(
-    DbContextOptions<VoxBoxDbContext> options,
-    ITenantContext tenantContext) : IVoxBoxDbContextFactory
-{
-    public object CreateDbContext()
-    {
-        return new VoxBoxDbContext(options, tenantContext);
     }
 }

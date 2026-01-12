@@ -16,11 +16,13 @@ namespace VoxBox.Infrastructure.Persistence;
 public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
 {
     private readonly ITenantContext _tenantContext;
+    private readonly DbContextOptions<VoxBoxDbContext> _options;
     private readonly Dictionary<Type, object> _repositories = new();
 
     public VoxBoxDbContext(DbContextOptions<VoxBoxDbContext> options, ITenantContext tenantContext)
         : base(options)
     {
+        _options = options;
         _tenantContext = tenantContext;
     }
 
@@ -31,9 +33,7 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
 
     public object CreateDbContext()
     {
-        var optionsBuilder = new DbContextOptionsBuilder<VoxBoxDbContext>();
-        optionsBuilder.UseSqlServer(Database.GetDbConnection().ConnectionString);
-        return new VoxBoxDbContext(optionsBuilder.Options, _tenantContext);
+        return new VoxBoxDbContext(_options, _tenantContext);
     }
 
     public IRepository<T> GetRepository<T>() where T : BaseEntity

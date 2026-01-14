@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using VoxBox.Infrastructure.Data;
 using VoxBox.Infrastructure.Middleware;
 using VoxBox.Infrastructure.Persistence;
@@ -16,6 +17,13 @@ builder.Services.AddOpenApi();
 builder.Services.ConfigureSqlServer(builder.Configuration);
 
 var app = builder.Build();
+
+// Apply pending migrations automatically
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<VoxBoxDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

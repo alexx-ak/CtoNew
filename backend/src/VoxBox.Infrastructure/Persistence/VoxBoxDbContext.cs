@@ -133,7 +133,8 @@ public class VoxBoxDbContext : DbContext, IVoxBoxDbContextFactory
             entity.HasIndex(e => e.EmailAddress);
             entity.HasIndex(e => e.TenantId);
 
-            // Foreign key relationships (self-referencing)
+            // Foreign key relationships
+            entity.HasOne<Tenant>().WithMany().HasForeignKey(e => e.TenantId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.CreatedBy).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.ModifiedBy).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.DeletedBy).OnDelete(DeleteBehavior.Restrict);

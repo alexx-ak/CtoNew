@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using VoxBox.Core.Common;
 using VoxBox.Core.Interfaces.Persistence;
 using VoxBox.Infrastructure.Persistence;
 

@@ -43,9 +43,8 @@ try
     // Add services to the container
     builder.Services.AddControllers();
     
-    // Configure Swagger/OpenAPI
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    // Configure OpenAPI with Aspire support
+    builder.Services.AddOpenApi();
     
     // Configure SQL Server with EF Core Code First
     builder.Services.ConfigureSqlServer(builder.Configuration);
@@ -62,12 +61,7 @@ try
     // Configure the HTTP request pipeline
     if (app.Environment.IsDevelopment())
     {
-        app.UseSwagger();
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "VoxBox API v1");
-            options.RoutePrefix = "swagger";
-        });
+        app.MapOpenApi();
     }
     
     // Add global exception handler middleware first to catch all exceptions

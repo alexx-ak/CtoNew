@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.Core", "VoxBox.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.Infrastructure", "VoxBox.Infrastructure\VoxBox.Infrastructure.csproj", "{8C8C4517-1F0C-805A-14CB-EC012AA1CE2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.ServiceDefaults", "VoxBox.ServiceDefaults\VoxBox.ServiceDefaults.csproj", "{F9936FB5-D98B-4D49-94C8-540D28B6BE12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxBox.AppHost", "VoxBox.AppHost\VoxBox.AppHost.csproj", "{5D8D8B12-6F53-4EAA-9B66-4C5A563C319E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +30,14 @@ Global
 		{8C8C4517-1F0C-805A-14CB-EC012AA1CE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C8C4517-1F0C-805A-14CB-EC012AA1CE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C8C4517-1F0C-805A-14CB-EC012AA1CE2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9936FB5-D98B-4D49-94C8-540D28B6BE12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9936FB5-D98B-4D49-94C8-540D28B6BE12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9936FB5-D98B-4D49-94C8-540D28B6BE12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9936FB5-D98B-4D49-94C8-540D28B6BE12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D8D8B12-6F53-4EAA-9B66-4C5A563C319E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D8D8B12-6F53-4EAA-9B66-4C5A563C319E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D8D8B12-6F53-4EAA-9B66-4C5A563C319E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D8D8B12-6F53-4EAA-9B66-4C5A563C319E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,6 +6,7 @@ using Serilog.Enrichers;
 using VoxBox.Infrastructure.Data;
 using VoxBox.Infrastructure.Middleware;
 using VoxBox.Infrastructure.Persistence;
+using VoxBox.ServiceDefaults;
 
 // Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
@@ -39,10 +40,12 @@ try
     
     // Use Serilog for logging
     builder.Host.UseSerilog();
-    
+
+    builder.AddServiceDefaults();
+
     // Add services to the container
     builder.Services.AddControllers();
-    
+
     // Configure OpenAPI with Aspire support
     builder.Services.AddOpenApi();
     
@@ -51,13 +54,17 @@ try
     
     var app = builder.Build();
     
+    var isOpenApiDocumentGeneration = Environment.GetCommandLineArgs()
+        .Any(arg => arg.Contains("dotnet-getdocument", StringComparison.OrdinalIgnoreCase));
+
     // Apply pending migrations automatically
-    using (var scope = app.Services.CreateScope())
+    if (!isOpenApiDocumentGeneration)
     {
+        using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<VoxBoxDbContext>();
         dbContext.Database.Migrate();
     }
-    
+
     // Configure the HTTP request pipeline
     if (app.Environment.IsDevelopment())
     {
@@ -71,9 +78,11 @@ try
     app.UseTenantContext();
     
     app.UseHttpsRedirection();
-    
+
     app.MapControllers();
-    
+
+    app.MapDefaultEndpoints();
+
     app.MapGet("/", () => Results.Ok(new { message = "VoxBox API is running", version = "1.0.0" }));
     
     // Test endpoint to verify exception handling

@@ -2,21 +2,18 @@
 
 ## Overview
 
-The VoxBox API provides a RESTful interface for managing tenants in a multi-tenant voting system. The API includes Swagger/OpenAPI documentation for easy exploration and testing of endpoints.
+The VoxBox API provides a RESTful interface for managing tenants in a multi-tenant voting system. The API includes OpenAPI documentation with Aspire support for easy exploration and testing of endpoints.
 
-## Accessing Swagger UI
+## Accessing API Documentation
 
-When running the application in **Development** mode, Swagger UI is available at:
+When running the application in **Development** mode, the API documentation is available at:
 
-```
-https://localhost:<port>/swagger
-```
+- **OpenAPI Specification**: `https://localhost:<port>/openapi/v1.json`
 
-Swagger UI provides:
-- Interactive API documentation
-- Ability to test API endpoints directly from the browser
-- Model schemas for all DTOs
-- Request/Response examples
+The OpenAPI specification can be imported into tools like:
+- Postman for testing API endpoints
+- Swagger UI for interactive documentation
+- Insomnia for API development
 
 ## Available Endpoints
 
@@ -164,7 +161,7 @@ The VoxBox API implements a multi-tenant architecture where:
 ## Technology Stack
 
 - **Framework**: ASP.NET Core 10.0
-- **API Documentation**: Swashbuckle.AspNetCore 7.2.0
+- **API Documentation**: Microsoft.AspNetCore.OpenApi 10.0.1 with Aspire support
 - **Database**: SQL Server with Entity Framework Core 10.0
 - **ID Generation**: UUID v7 (time-sortable GUIDs)
 - **Architecture**: Clean Architecture with Repository Pattern
@@ -180,7 +177,7 @@ dotnet ef migrations add MigrationName --startup-project ../VoxBox.Api
 
 ## Testing the API
 
-1. **Using Swagger UI**: Navigate to `/swagger` in development mode
+1. **Using OpenAPI tools**: Import the OpenAPI specification from `/openapi/v1.json` into your preferred API tool
 2. **Using curl**:
    ```bash
    # Get all tenants
@@ -191,4 +188,3 @@ dotnet ef migrations add MigrationName --startup-project ../VoxBox.Api
      -H "Content-Type: application/json" \
      -d '{"name":"Test","tenancyName":"test","isActive":true}'
    ```
-3. **Using Postman**: Import the OpenAPI specification from `/swagger/v1/swagger.json`

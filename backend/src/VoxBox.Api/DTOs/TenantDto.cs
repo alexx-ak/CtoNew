@@ -1,16 +1,16 @@
 namespace VoxBox.Api.DTOs;
 
-public class TenantDto
+public record TenantDto
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string TenancyName { get; set; } = string.Empty;
-    public bool IsPrivate { get; set; }
-    public int VoteWeightMode { get; set; }
-    public string AdminIdentifiers { get; set; } = string.Empty;
-    public bool IsActive { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public Guid? CreatedBy { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    public Guid? ModifiedBy { get; set; }
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string TenancyName { get; init; } = string.Empty;
+    public bool IsPrivate { get; init; }
+    public int VoteWeightMode { get; init; }
+    public string AdminIdentifiers { get; init; } = string.Empty;
+    public bool IsActive { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public Guid? CreatedBy { get; init; }
+    public DateTime? UpdatedAt { get; init; }
+    public Guid? ModifiedBy { get; init; }
 }

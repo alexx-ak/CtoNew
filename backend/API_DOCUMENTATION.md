@@ -114,6 +114,8 @@ Soft delete a tenant
 
 ## Data Models
 
+**Implementation note**: API DTOs are implemented as C# `record` types with `init`-only properties.
+
 ### TenantDto
 Response model for tenant data
 - `id`: Unique identifier (GUID/UUID v7)

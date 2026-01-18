@@ -112,6 +112,11 @@ dotnet ef database update --project ../VoxBox.Infrastructure/VoxBox.Infrastructu
 3. **Configure** in `OnModelCreating`
 4. **Create migration**
 
+## DTO conventions
+
+- DTOs in the API layer should be implemented as C# `record` types (not `class`) to encourage immutability and value-based semantics.
+- Prefer `init`-only properties for DTOs.
+
 ## Running Tests
 
 ```bash

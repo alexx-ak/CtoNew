@@ -7,6 +7,7 @@ using VoxBox.Infrastructure.Data;
 using VoxBox.Infrastructure.Middleware;
 using VoxBox.Infrastructure.Persistence;
 using VoxBox.ServiceDefaults;
+using Scalar.AspNetCore;
 
 // Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
@@ -60,14 +61,34 @@ try
     // Apply pending migrations automatically
     if (!isOpenApiDocumentGeneration)
     {
-        using var scope = app.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<VoxBoxDbContext>();
-        dbContext.Database.Migrate();
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<VoxBoxDbContext>();
+            
+            // Check if database connection is available before attempting migration
+            var canConnect = dbContext.Database.CanConnect();
+            if (canConnect)
+            {
+                Log.Information("Database connection available, applying migrations...");
+                dbContext.Database.Migrate();
+                Log.Information("Database migrations applied successfully");
+            }
+            else
+            {
+                Log.Warning("Database connection not available. Skipping migrations.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Database migration failed. Continuing without database connection.");
+        }
     }
 
     // Configure the HTTP request pipeline
     if (app.Environment.IsDevelopment())
     {
+        app.MapScalarApiReference();
         app.MapOpenApi();
     }
     
@@ -83,7 +104,15 @@ try
 
     app.MapDefaultEndpoints();
 
-    app.MapGet("/", () => Results.Ok(new { message = "VoxBox API is running", version = "1.0.0" }));
+    app.MapGet("/", () =>
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            return Results.Redirect("/scalar/v1");
+        }
+        
+        return Results.Ok(new { message = "VoxBox API is running", version = "1.0.0" });
+    });
     
     // Test endpoint to verify exception handling
     app.MapGet("/test-exception", () =>

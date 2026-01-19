@@ -3,6 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Enrichers;
+using VoxBox.Api.Mappers;
 using VoxBox.Infrastructure.Data;
 using VoxBox.Infrastructure.Middleware;
 using VoxBox.Infrastructure.Persistence;
@@ -46,6 +47,10 @@ try
 
     // Add services to the container
     builder.Services.AddControllers();
+
+    // Register mappers
+    builder.Services.AddScoped<TenantMapper>();
+    builder.Services.AddScoped<UserMapper>();
 
     // Configure OpenAPI with Aspire support
     builder.Services.AddOpenApi();
